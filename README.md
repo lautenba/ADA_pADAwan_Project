@@ -12,8 +12,6 @@ Trends of food production over the years and search for correlations with the po
 
 Is there an increase|decrease in the use of some ingredients in the recent years ? If so, why ?
 
-Is there a link between the rating of the recipes and the time needed to cook them ?
-
 From where does the rating of the recipe come from ? Ingredients, time, combination between ingredients, what type of meal (main course, dessert), originality, (try to predict some "ideal recipes by interpolating) ?
 
 
