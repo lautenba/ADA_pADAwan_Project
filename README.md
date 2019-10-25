@@ -8,6 +8,17 @@ A 150 word description of the project idea, goals, dataset used. What story you 
 # Research questions
 A list of research questions you would like to address during the project.
 
+Trends of food production over the years and search for correlations with the popularity of different recipes.
+
+Is there an increase|decrease in the use of some ingredients in the recent years ? If so, why ?
+
+Is there a link between the rating of the recipes and the time needed to cook them ?
+
+From where does the rating of the recipe come from ? Ingredients, time, combination between ingredients, what type of meal (main course, dessert), originality, (try to predict some "ideal recipes by interpolating) ?
+
+
+
+
 
 
 # Dataset
@@ -22,6 +33,18 @@ Cooking recipes
 
 # A list of internal milestones up until project milestone 2
 Add here a sketch of your planning for the next project milestone.
+
+Import dataset
+
+Filter dataset (keep interseting and useful data)
+
+Clean the data
+
+Analyse
+
+Predict good recipes (optionnal)
+
+
 
 # Questions for TAa
 Add here some questions you have for us, in general or project-specific.
