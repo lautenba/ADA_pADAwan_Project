@@ -10,11 +10,13 @@ What defines a successful recipe? There are a million different meals that have 
 # Research questions
 A list of research questions you would like to address during the project.
 
-Trends of food production over the years and search for correlations with the popularity of different recipes.
+For our project, we will focus on the following questions:
 
-Is there an increase|decrease in the use of some ingredients in the recent years ? If so, why ?
+- Trends of food production over the years and search for correlations with the popularity of different recipes.
 
-From where does the rating of the recipe come from ? Ingredients, time, combination between ingredients, what type of meal (main course, dessert), originality, (try to predict some "ideal recipes by interpolating) ?
+- Is there an increase|decrease in the use of some ingredients in the recent years ? If so, why ?
+
+- From where does the rating of the recipe come from ? Ingredients, time, combination between ingredients, what type of meal (main course, dessert), originality, (try to predict some "ideal recipes by interpolating) ?
 
 
 
@@ -24,11 +26,12 @@ From where does the rating of the recipe come from ? Ingredients, time, combinat
 # Dataset
 List the dataset(s) you want to use, and some ideas on how do you expect to get, manage, process and enrich it/them. Show us you've read the docs and some examples, and you've a clear idea on what to expect. Discuss data size and format if relevant.
 
+Cooking recipes
+
 Global Food & Agriculture Statistics
 
 Recipe1M+
 
-Cooking recipes
 
 
 # A list of internal milestones up until project milestone 2
