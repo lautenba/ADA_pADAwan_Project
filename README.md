@@ -27,7 +27,7 @@ For our project, we will focus on the following questions:
 # Dataset
 List the dataset(s) you want to use, and some ideas on how do you expect to get, manage, process and enrich it/them. Show us you've read the docs and some examples, and you've a clear idea on what to expect. Discuss data size and format if relevant.
 
-Cooking recipes
+Cooking recipes : Contains the ingredients and the rating of the recipe (for most of them we could identify the year with the earliest comment)
 
 Global Food & Agriculture Statistics
 
@@ -42,13 +42,16 @@ Import dataset
 
 Filter dataset (keep interseting and useful data)
 
-Clean the data
+Clean the data (adapt each value of the resulting data to fit in our functions)
 
-Analyse
+Analyse (the correctness of  our solution, the possible misintepretations and the limitations of our dataset)
 
-Predict good recipes (optionnal)
+Predict good recipes (optional)
 
 
 
 # Questions for TAa
 Add here some questions you have for us, in general or project-specific.
+- Is the prediction system doable in a reasonable amount of time ? 
+
+- Are we allowed to import any libraries that can help us with our tasks ?
