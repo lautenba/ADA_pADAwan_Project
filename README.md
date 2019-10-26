@@ -12,12 +12,13 @@ A list of research questions you would like to address during the project.
 
 For our project, we will focus on the following questions:
 
-- Trends of food production over the years and search for correlations with the popularity of different recipes.
-
-- Is there an increase|decrease in the use of some ingredients in the recent years ? If so, why ?
-
 - From where does the rating of the recipe come from ? Ingredients, time, combination between ingredients, what type of meal (main course, dessert), originality, (try to predict some "ideal recipes by interpolating) ?
 
+- Is the pattern clear enough to be able to predict the ranking a new recipe will have ? 
+
+- (Trends of food production over the years and search for correlations with the popularity of different recipes.)
+
+- (Is there an increase|decrease in the use of some ingredients in the recent years ? If so, why ?)
 
 
 
