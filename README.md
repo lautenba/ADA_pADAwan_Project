@@ -1,9 +1,9 @@
-# Title
+# The Ingredients of A Good Recipe
 
 # Abstract
 A 150 word description of the project idea, goals, dataset used. What story you would like to tell and why? What's the motivation behind your project?
 
-What defines a successful recipe? There are a million different meals that have different popularities, and we each have our favorite ones. However, a lot of meals are objectively appreciated across a large part of the population… But what could be the origin of this attractiveness? Our goal is to investigate every variable that could have an impact on the success of the recipe, such as the ingredients, the type of meal (main course, dessert, …), time to prepare it, etc … We plan to use the dataset “Cooking recipes” which provides a ranking of the recipe as well as a lot of interesting variables. We will investigate the relations between these variables and the ranking of the recipe. Based on our analysis, we will create a model that is able to predict the ranking of a random recipe. We will also try to see if this model is able to create new recipes by using the optimal parameters found during the analysis.
+What defines a successful recipe? There are a million different meals that have different popularities, and we each have our favorite ones. However, a lot of meals are objectively appreciated across a large part of the population… But what could be the origin of this attractiveness? Our goal is to investigate every variable that could have an impact on the success of the recipe, such as the ingredients, the type of meal (main course, dessert, …), time to prepare it, etc … We plan to use the dataset “Cooking recipes” which provides a ranking of the recipe as well as a lot of interesting variables. We will investigate the relations between these variables and the ranking of the recipe. Based on our analysis, we will create a model that is able to predict the rating of a random recipe. We will also try to see whether this model is able to create new recipes by using the optimal parameters found during the analysis.
 
 
 
@@ -27,7 +27,7 @@ For our project, we will focus on the following questions:
 # Dataset
 List the dataset(s) you want to use, and some ideas on how do you expect to get, manage, process and enrich it/them. Show us you've read the docs and some examples, and you've a clear idea on what to expect. Discuss data size and format if relevant.
 
-Cooking recipes : Contains the ingredients and the rating of the recipe (for most of them we could identify the year with the earliest comment)
+Cooking recipes : Contains the ingredients and the rating of the recipe (for most of them we could identify the year with the earliest comment). Scraping will be needed since the dataset contains webpages, and it will take a long time since there are different types of webpages.
 
 Global Food & Agriculture Statistics
 
@@ -38,16 +38,23 @@ Recipe1M+
 # A list of internal milestones up until project milestone 2
 Add here a sketch of your planning for the next project milestone.
 
-Import dataset
+Import datasets/ Learn to use the cluster (we probably won't use it)
 
-Filter dataset (keep interseting and useful data)
+Study the datasets and choose the essential information
+
+Scrap the datasets (such as the Cooking recipes)
+
+Filter dataset (keep interesting and useful data)
 
 Clean the data (adapt each value of the resulting data to fit in our functions)
 
-Analyse (the correctness of  our solution, the possible misintepretations and the limitations of our dataset)
+Analyse (the correctness of our solution, the possible misintepretations and the limitations of our dataset)
 
 Predict good recipes (optional)
 
+Creation of the poster
+
+Preparation for the presentation
 
 
 # Questions for TAa
