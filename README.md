@@ -54,7 +54,7 @@ We plan to mainly use the dataset "Cooking recipes". It contains the ingredients
 
 - Created new recipes with the obtained data
 
-- Determine relations between the ingredient used in recipe and the production of those ingredient (based on the year of production/used recipes)
+- Determine relations between the popular ingredients used in recipes and the production quantity of those ingredients (based on the year of production/used recipes)
 
 20.12.2019:
 
@@ -73,4 +73,4 @@ We plan to mainly use the dataset "Cooking recipes". It contains the ingredients
 
 - Are we allowed to import any libraries that can help us with our tasks ?
 
-- Is the aim of we have enough to make a project ?
+- Are the goals we have enough to make a good project ?
