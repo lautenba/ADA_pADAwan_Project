@@ -52,8 +52,6 @@ Add here a sketch of your planning for the next project milestone.
 
 - Filter dataset (keep interesting and useful data)
 
-29.11.2019: Clean the data (adapt each value of the resulting data to fit in our functions)
-
 06.12.2019: 
 
 - Clean the data (adapt each value of the resulting data to fit in our functions)
@@ -66,7 +64,7 @@ Add here a sketch of your planning for the next project milestone.
 
 20.12.2019:
 
-- Finalized Data Notebook
+- Finalize the Data Notebook
 
 10.01.2020:
 
