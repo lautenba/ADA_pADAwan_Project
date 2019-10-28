@@ -54,7 +54,7 @@ Cooking recipes: Contains the ingredients, the rating of the recipe (number and 
 
 - Created new recipes with the obtained data
 
--Determine correlation between year of production and used ingredient in recipe
+- Determine relation between the ingredient between year of production and used ingredient in recipe
 
 20.12.2019:
 
