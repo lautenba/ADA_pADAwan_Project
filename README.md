@@ -12,9 +12,11 @@ A list of research questions you would like to address during the project.
 
 For our project, we will focus on the following questions:
 
-- From where does the rating of the recipe come from ? Ingredients, time, combination between ingredients, what type of meal (main course, dessert), originality, (try to predict some "ideal recipes by interpolating) ?
+- From where does the rating of the recipe come from ? Ingredients, time, combination between ingredients, what type of meal (main course, dessert), originality ?
 
 - Is the pattern clear enough to be able to predict the ranking a new recipe will have ? 
+
+- Is it possible to create new recipes by using the data gathered in the analysis ?
 
 - (Trends of food production over the years and search for correlations with the popularity of different recipes.)
 
