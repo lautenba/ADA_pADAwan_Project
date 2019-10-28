@@ -16,17 +16,15 @@ For our project, we will focus on the following questions:
 
 - Is it possible to create new good recipes by using the data gathered in the analysis ?
 
-- Is it possible to find some relations between the ingredient used in recipe and the production of those ingredient (based on the year of production/used recipes)?
-
+- Is there a relation between the ingredients used in popular recipes and the production quantity of those ingredients in the year where the recipe is popular
 
 
 
 
 
 # Dataset
-List the dataset(s) you want to use, and some ideas on how do you expect to get, manage, process and enrich it/them. Show us you've read the docs and some examples, and you've a clear idea on what to expect. Discuss data size and format if relevant.
 
-We plan to mainly use the dataset "Cooking recipes". It contains the ingredients, the rating of the recipe (number of reviews and grade of the recipe to assign a popularity index) and for most of them we can estimate the upload year by looking at the earliest comment. Scraping will be needed since the dataset contains webpages, and it will take a long time since there are different types of webpages. If we want to improve/expand our dataset we can use other recipes found in the Recipe1M+ database (Json file), which contains information about the ingredients and the steps to cook it. For the predictive part, the first task will be to select the variables which have a significant impact on the raking. Then, the second task will be to find the best combos of variables by performing a PCA for example. After that, if the linearity of the system is pleasing enough, we will use these principal axis for the prediction of the rank of a random recipe. Finally, by using an agglomeration function will determine the tendency of ingredients used in recipe and compare them with the ingredient production per year and per country (Global Food & Agriculture Statistics dataset) to see if we can detect some relations (based on the year of production/used recipes).
+We plan to mainly use the dataset "Cooking recipes". It contains the ingredients, the rating of the recipe (number of reviews and grade of the recipe to assign a popularity index) and for most of them we can estimate the upload year by looking at the earliest comment. Scraping will be needed since the dataset contains webpages, and it will take a long time since there are different types of webpages. If we want to improve/expand our dataset we can use other recipes found in the Recipe1M+ database (Json file), which contains information about the ingredients and the steps to cook the recipe. For the predictive part, the first task will be to select the variables which have a significant impact on the ranking. Then, the second task will be to find the best combos of variables by performing PCA for example. After that, if the linearity of the system is pleasing enough, we will use these principal axis for the prediction of the rank of a random recipe. Finally, by using an agglomeration function will determine the tendency of ingredients used in recipes and compare them with the ingredient production per year and per country (Global Food & Agriculture Statistics dataset) to see if we can detect some relations (based on the production year/used recipes).
 
 
 
@@ -52,7 +50,7 @@ We plan to mainly use the dataset "Cooking recipes". It contains the ingredients
 
 - Create function to determine the ranking of a new recipe based on the analysis results
 
-- Created new recipes with the obtained data
+- Create new recipes with the obtained data
 
 - Determine if there is a relation between the ingredients used in popular recipes and the production quantity of those ingredients in the year where the recipe is popular
 
@@ -72,5 +70,3 @@ We plan to mainly use the dataset "Cooking recipes". It contains the ingredients
 - Is the prediction system doable in a reasonable amount of time ? 
 
 - Are we allowed to import any libraries that can help us with our tasks ?
-
-- Are the goals we have enough to make a good project ?
