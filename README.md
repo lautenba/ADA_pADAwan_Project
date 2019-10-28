@@ -64,6 +64,10 @@ Add here a sketch of your planning for the next project milestone.
 
 - Predict new recipes with the obtained data
 
+20.12.2019:
+
+- Finalized Data Notebook
+
 10.01.2020:
 
 - Creation of the poster
