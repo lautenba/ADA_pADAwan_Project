@@ -29,7 +29,7 @@ For our project, we will focus on the following questions:
 # Dataset
 List the dataset(s) you want to use, and some ideas on how do you expect to get, manage, process and enrich it/them. Show us you've read the docs and some examples, and you've a clear idea on what to expect. Discuss data size and format if relevant.
 
-Cooking recipes : Contains the ingredients and the rating of the recipe (for most of them we could identify the year with the earliest comment). Scraping will be needed since the dataset contains webpages, and it will take a long time since there are different types of webpages.
+Cooking recipes: Contains the ingredients and the rating of the recipe (for most of them we could identify the year with the earliest comment). Scraping will be needed since the dataset contains webpages, and it will take a long time since there are different types of webpages.
 
 Global Food & Agriculture Statistics
 
@@ -40,7 +40,7 @@ Recipe1M+
 # A list of internal milestones up until project milestone 2
 Add here a sketch of your planning for the next project milestone.
 
-15.11.2019: 
+08.11.2019: 
 
 - Import datasets / Learn how to use the cluster
 
@@ -48,15 +48,19 @@ Add here a sketch of your planning for the next project milestone.
 
 - Scrap/filter the datasets (keep interesting and useful data)
 
-06.12.2019: 
+29.11.2019:
 
 - Clean the data (adapt each value of the resulting data to fit in our functions)
 
 - Analyse the correctness of our solution, the possible misintepretations and the limitations of our dataset
 
-13.12.2019: 
+- Start Data Notebook
 
-- Predict new recipes with the obtained data
+06.12.2019: 
+
+- Create function to determine the ranking of a new recipe based on the analysis results
+
+- Created new recipes with the obtained data
 
 20.12.2019:
 
