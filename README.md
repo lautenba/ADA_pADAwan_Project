@@ -46,15 +46,23 @@ Add here a sketch of your planning for the next project milestone.
 
 - Study the datasets and select the useful information
 
-15.11.2019: Scrap the datasets (such as the Cooking recipes)
+22.11.2019: 
 
-22.11.2019: Filter dataset (keep interesting and useful data)
+- Scrap the datasets (such as the Cooking recipes)
+
+- Filter dataset (keep interesting and useful data)
 
 29.11.2019: Clean the data (adapt each value of the resulting data to fit in our functions)
 
-06.12.2019: Analyse (the correctness of our solution, the possible misintepretations and the limitations of our dataset)
+06.12.2019: 
 
-13.12.2019: Predict new recipes with the obtained data
+- Clean the data (adapt each value of the resulting data to fit in our functions)
+
+- Analyse (the correctness of our solution, the possible misintepretations and the limitations of our dataset)
+
+13.12.2019: 
+
+- Predict new recipes with the obtained data
 
 10.01.2020:
 
