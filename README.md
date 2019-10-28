@@ -54,7 +54,7 @@ We plan to mainly use the dataset "Cooking recipes". It contains the ingredients
 
 - Created new recipes with the obtained data
 
-- Determine relation between the ingredient between year of production and used ingredient in recipe
+- Determine relations between the ingredient used in recipe and the production of those ingredient (based on the year of production/used recipes)
 
 20.12.2019:
 
