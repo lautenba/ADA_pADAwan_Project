@@ -40,23 +40,27 @@ Recipe1M+
 # A list of internal milestones up until project milestone 2
 Add here a sketch of your planning for the next project milestone.
 
-Import datasets/ Learn to use the cluster (we probably won't use it)
+08.11.2019: 
 
-Study the datasets and choose the essential information
+- Import datasets/ Learn to use the cluster (we probably won't use it)
 
-Scrap the datasets (such as the Cooking recipes)
+- Study the datasets and select the useful information
 
-Filter dataset (keep interesting and useful data)
+15.11.2019: Scrap the datasets (such as the Cooking recipes)
 
-Clean the data (adapt each value of the resulting data to fit in our functions)
+22.11.2019: Filter dataset (keep interesting and useful data)
 
-Analyse (the correctness of our solution, the possible misintepretations and the limitations of our dataset)
+29.11.2019: Clean the data (adapt each value of the resulting data to fit in our functions)
 
-Predict good recipes (optional)
+06.12.2019: Analyse (the correctness of our solution, the possible misintepretations and the limitations of our dataset)
 
-Creation of the poster
+13.12.2019: Predict new recipes with the obtained data
 
-Preparation for the presentation
+10.01.2020:
+
+- Creation of the poster
+
+- Preparation for the presentation
 
 
 # Questions for TAa
