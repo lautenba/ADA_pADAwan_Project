@@ -1,4 +1,4 @@
-# The Ingredients of A Good Recipe
+# Ingredients For A Good Recipe
 
 # Abstract
 A 150 word description of the project idea, goals, dataset used. What story you would like to tell and why? What's the motivation behind your project?
@@ -75,6 +75,9 @@ Add here a sketch of your planning for the next project milestone.
 
 # Questions for TAa
 Add here some questions you have for us, in general or project-specific.
+
 - Is the prediction system doable in a reasonable amount of time ? 
 
 - Are we allowed to import any libraries that can help us with our tasks ?
+
+- Is the aim of our idea enough to make a project ?
