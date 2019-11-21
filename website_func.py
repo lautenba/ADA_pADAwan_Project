@@ -63,23 +63,34 @@ def website_from_log(s):
     #print(filename)
     return website, filename
 
-def retrieve_website_from_log():
-    # Create the folder of the sorted files by website
+
+# Sort the files according to their website and put their filenames altogether in a folder corresponding to a website domain
+def sort_website_from_log(override=False):
+    # Name of the folder containing the sorted website files
     p = Path("SortedFiles/")
-    p.mkdir(parents=True, exist_ok=True)
     
-    path_to_log = Path("recipePages/msg.log")
-    
-    with open(path_to_log, "r") as f:
-        for line in f.readlines():
-            web, file = website_from_log(line)
-            if file == "": ## ignore this line
-                continue
-            destination = p / web
-            destination.mkdir(parents=True, exist_ok=True)
-            destinationFile = destination / "filesName.txt"
-            with destinationFile.open("a+") as fid:
-                fid.write(file + "\n")
+    # If it already exists, we don't do anything. Except if override is true
+    if not p.is_dir() or override:
+        
+        if override:
+            shutil.rmtree(p) # Delete the folder and the files in it
+            
+        # Create the folder of the sorted files by website
+        #p = Path("SortedFiles/")
+        p.mkdir(parents=True, exist_ok=True)
+
+        path_to_log = Path("recipePages/msg.log")
+
+        with open(path_to_log, "r") as f:
+            for line in f.readlines():
+                web, file = website_from_log(line)
+                if file == "": ## ignore this line
+                    continue
+                destination = p / web
+                destination.mkdir(parents=True, exist_ok=True)
+                destinationFile = destination / "filesName.txt"
+                with destinationFile.open("a+") as fid:
+                    fid.write(file + "\n")
     print("Finished sorting the files")
 #     try:
 #     loop.run_until_complete(bar())
