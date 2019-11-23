@@ -119,7 +119,7 @@ def scrap_food(website, filename, list_ingredient_to_remove, list_unique_ingredi
         print("Beautifulsoup can't read the page:",filename)
         return recipe_data, list_unique_ingredients, unique_ingredients_data
                 
-    recipe_name = soup.find('span', class_='itemreviewed')
+    recipe_name = soup.find('h1', class_='fn')
                 
     #We only take recipes and not searching pages
     if recipe_name is None:
@@ -128,60 +128,45 @@ def scrap_food(website, filename, list_ingredient_to_remove, list_unique_ingredi
         
     recipe_name = recipe_name.text
     
-    rating_html = soup.find('img', class_='rating')
-                
-    #Determine position of the ranking in the string
-    start_rank = 59
-    end_rank = 62
-    rating = rating_html['title'][start_rank:end_rank]
-          
+    rating = soup.find('li', {"class":"current-rating"})
+    print("rating", rating)
+    if rating is None:
+        return recipe_data, list_unique_ingredients, unique_ingredients_data
+    rating = float(rating["style"][7:-2]) *5/100
+    print("rating", rating)   
     #print(recipe_name)
     #print(rating)
                 
     #Determine the number of reviews:
-    if soup.find('span', class_='count') is not None:
-        review_html = soup.find('span', class_='count').text
-        review = int(review_html.replace(',',''))
+    review_html = soup.find('span', itemprop='reviewCount')
+    if review_html is not None:
+        review = int(review_html.text.replace(',',''))
     else:
         review = 0
-        #print('Reviews :',review)
+    print('Reviews :',review)
     
     #Find the preparation time:
     prepare_time = np.nan
-    soup1 = soup.find('span', class_='totalTime')
+    soup1 = soup.find('h3', class_='duration')
     if soup1 is not None:
-                
-        prepare_time_html = soup1.find('span', class_='value-title')
-        #Determine position of the time in the string
-        start_prepare_time = 2
-        end_prepare_time = len(prepare_time_html['title']) 
-        prepare_time_not_converted = prepare_time_html['title'][start_prepare_time:end_prepare_time]
-
-        #If recipe is more than a day:
-        if 'Day' in prepare_time_not_converted:
-            time_analyse = prepare_time_not_converted.split('Day')
-            time_hours = time_analyse[1].split('H')
-            #To convert into minutes (add the days and hours to the minutes)
-            if len(time_hours) == 1:
-                prepare_time = int(time_analyse[0])*60*24 + int(time_hours[0].replace('M',''))
-            if len(time_hours) == 2:
-                time_minute = time_hours[1].replace('M','');
-                prepare_time = int(time_analyse[0])*60*24 + int(time_hours[0])*60 + (int(time_minute) if time_minute else 0) 
-             #If the recipe is only in hours and minutes        
-        else:
-            time_analyse = prepare_time_not_converted.split('H')
-            #To convert hours into minutes
-            if len(time_analyse) == 1:
-                prepare_time = int(time_analyse[0].replace('M',''))
-            if len(time_analyse) == 2:
-                time_minute = time_analyse[1].replace('M','');
-                prepare_time = int(time_analyse[0])*60 + (int(time_minute) if time_minute else 0)
-                    
+        
+        words_time = soup1.text.split(" ")
+        len_words_time = len(words_time)
+        if len_words_time %2 == 1:
+            print("strange words", words_time)
+        
+        prepare_time = 0
+        for i in range(int(len_words_time/2)):
+            try : 
+                prepare_time += 60**i * int(words_time[len_words_time -(1+i)*2])
+            except :
+                prepare_time = 0 
+                print(" ERROR TIME ")            
                 
     #Find the ingredient list:
     list_ingred = []
-    ingredients = soup.find('div', class_='ingredients')
-    all_ingredients = ingredients.find_all('li',class_="plaincharacterwrap ingredient")
+    ingredients = soup.find('div', class_='pod ingredients')
+    all_ingredients = ingredients.find_all('a')
     for ingredient in all_ingredients:
         ingredient_i = ingredient.text.replace('\n','').lower()
         #print('Original:', ingredient_i)
@@ -207,7 +192,6 @@ def scrap_food(website, filename, list_ingredient_to_remove, list_unique_ingredi
             else:
                 ingredient_index = unique_ingredients_data[unique_ingredients_data['Ingredient']== ingredient_in_list_strip].index[0]
                 unique_ingredients_data.at[ingredient_index,'Count'] = unique_ingredients_data['Count'][ingredient_index] + 1
-                            
                     
             #print(list_ingred) 
             
