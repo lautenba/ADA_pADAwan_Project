@@ -5,6 +5,18 @@ from bs4 import BeautifulSoup
 import numpy as np
 
 
+def try_reading(filename, max_iter = 3):
+    result= None
+    i = 0
+    while (result is None) or i <= max_iter:
+        i+=1
+        try:
+            result = BeautifulSoup(open(filename), "html.parser") 
+        except:
+            print("Error Reading")
+            pass
+    return result
+
 ##################### SCRAPING FUNCTIONS
 def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_ingredients, recipe_data, website_list_used ,unique_ingredients_data):
                                                                                                 # used_0 correspond to the first website i.e allrecipes
@@ -51,14 +63,23 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
         start_prepare_time = 2
         end_prepare_time = len(prepare_time_html['title']) 
         prepare_time_not_converted = prepare_time_html['title'][start_prepare_time:end_prepare_time]
-
+        #print("prepare time", prepare_time_not_converted)
         #If recipe is more than a day:
-        if 'Day' in prepare_time_not_converted:
-            time_analyse = prepare_time_not_converted.split('Day')
+        if ('Day' or 'Days') in prepare_time_not_converted:
+            text_to_split_on ="" 
+            if 'Days' in prepare_time_not_converted:
+                text_to_split_on = 'Days' 
+            else:
+                text_to_split_on = 'Day'
+            time_analyse = prepare_time_not_converted.split(text_to_split_on)
             time_hours = time_analyse[1].split('H')
             #To convert into minutes (add the days and hours to the minutes)
             if len(time_hours) == 1:
-                prepare_time = int(time_analyse[0])*60*24 + int(time_hours[0].replace('M',''))
+                try:
+                    prepare_time = int(time_analyse[0])*60*24 + int(time_hours[0].replace('M',''))
+                except:
+                    print("text time", time_analyse, " filename", filename)
+                    return recipe_data, list_unique_ingredients, unique_ingredients_data
             if len(time_hours) == 2:
                 time_minute = time_hours[1].replace('M','');
                 prepare_time = int(time_analyse[0])*60*24 + int(time_hours[0])*60 + (int(time_minute) if time_minute else 0) 
@@ -76,6 +97,11 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
     #Find the ingredient list:
     list_ingred = []
     ingredients = soup.find('div', class_='ingredients')
+    
+    if ingredients is None:
+        print("No ingredients found :", filename)
+        return recipe_data,list_unique_ingredients, unique_ingredients_data
+    
     all_ingredients = ingredients.find_all('li',class_="plaincharacterwrap ingredient")
     for ingredient in all_ingredients:
         ingredient_i = ingredient.text.replace('\n','').lower()
@@ -110,47 +136,52 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
                                                   'Ingredients': list_ingred}, ignore_index=True)
     return recipe_data, list_unique_ingredients, unique_ingredients_data
 
-
+## Scraping the files of the domain food.com
 def scrap_food(website, filename, list_ingredient_to_remove, list_unique_ingredients, recipe_data, website_list_used ,unique_ingredients_data):
                                                                                             
     try:
         soup = BeautifulSoup(open(filename), "html.parser")
     except:
-        print("Beautifulsoup can't read the page:",filename)
+        print("Beautifulsoup can't read the page (food.com):",filename)
         return recipe_data, list_unique_ingredients, unique_ingredients_data
+#     soup = try_reading(filename)
+#     if soup is None:
+#         print("Beautifulsoup can't read the page (food.com):",filename)
+#         return recipe_data, list_unique_ingredients, unique_ingredients_data
                 
     recipe_name = soup.find('h1', class_='fn')
                 
     #We only take recipes and not searching pages
     if recipe_name is None:
-        print("We don't care about this page: ",filename)
+        print("No name found : We don't care about this page: ",filename)
         return recipe_data, list_unique_ingredients, unique_ingredients_data
         
     recipe_name = recipe_name.text
     
     rating = soup.find('li', {"class":"current-rating"})
-    print("rating", rating)
+    # If no rating can be found, we don't use the file
     if rating is None:
+        print("No rating found")
         return recipe_data, list_unique_ingredients, unique_ingredients_data
-    rating = float(rating["style"][7:-2]) *5/100
-    print("rating", rating)   
+    rating = float(rating["style"][7:-2]) *5/100 # the review is a percentage of 5 stars storred in the attribute of a li block
+    #print("rating", rating)   
     #print(recipe_name)
     #print(rating)
-                
+    if recipe_name is None:
+        print("No name but rating found at the file ", filename)
     #Determine the number of reviews:
     review_html = soup.find('span', itemprop='reviewCount')
     if review_html is not None:
         review = int(review_html.text.replace(',',''))
     else:
         review = 0
-    print('Reviews :',review)
     
     #Find the preparation time:
     prepare_time = np.nan
     soup1 = soup.find('h3', class_='duration')
     if soup1 is not None:
         
-        words_time = soup1.text.split(" ")
+        words_time = soup1.text.strip().split(" ")
         len_words_time = len(words_time)
         if len_words_time %2 == 1:
             print("strange words", words_time)
@@ -161,11 +192,16 @@ def scrap_food(website, filename, list_ingredient_to_remove, list_unique_ingredi
                 prepare_time += 60**i * int(words_time[len_words_time -(1+i)*2])
             except :
                 prepare_time = 0 
-                print(" ERROR TIME ")            
+                print(" ERROR TIME on file ", filename, " with time ", words_time, "and text", soup1.text)            
                 
     #Find the ingredient list:
     list_ingred = []
     ingredients = soup.find('div', class_='pod ingredients')
+    
+    if ingredients is None:
+        print("No ingredients found :", filename)
+        return recipe_data,list_unique_ingredients, unique_ingredients_data
+    
     all_ingredients = ingredients.find_all('a')
     for ingredient in all_ingredients:
         ingredient_i = ingredient.text.replace('\n','').lower()
@@ -220,10 +256,13 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
     #print("the recipe_name is :",recipe_name)
     
     rating_html = soup.find('div', class_='rm-block lead hreview-aggregate review')
-    rating_html = rating_html.find('div')    
+    if (rating_html is None) or (rating_html.find('div') is None):
+        print("No rating found")
+        return recipe_data, list_unique_ingredients, unique_ingredients_data 
     
     #Determine the rating in the html sequence
-    rating = rating_html['title']
+    rating = rating_html.find('div')['title']
+    #rating =  rating_html.find('div')['title']
           
     #print("the rating is:", rating)
                 
@@ -245,10 +284,15 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
     if prepare_time_html is not None:
                 
         prepare_time_not_converted = prepare_time_html['title'].replace('PT','')
-
+        
         #If recipe is more than a day:
-        if 'Day' in prepare_time_not_converted:
-            time_analyse = prepare_time_not_converted.split('Day')
+        if ('Day' or 'Days') in prepare_time_not_converted:
+            text_to_split_on ="" 
+            if 'Days' in prepare_time_not_converted:
+                text_to_split_on = 'Days' 
+            else:
+                text_to_split_on = 'Day'
+            time_analyse = prepare_time_not_converted.split(text_to_split_on)
             time_hours = time_analyse[1].split('H')
             #To convert into minutes (add the days and hours to the minutes)
             if len(time_hours) == 1:
@@ -271,8 +315,11 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
     list_ingred = []
     ingredients = soup.find('ul', class_='kv-ingred-list1')
     if ingredients is None:
-        ingredients = soup.find('ul', class_='kv-ingred-list2')
+        ingredients = soup.find('ul', class_='kv-ingred-list2')  
         
+    if ingredients is None:
+        print("No ingredients found :", filename)
+        return recipe_data,list_unique_ingredients, unique_ingredients_data
         
     all_ingredients = ingredients.find_all('li',class_="ingredient")
     for ingredient in all_ingredients:
