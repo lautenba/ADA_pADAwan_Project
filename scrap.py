@@ -137,8 +137,9 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
     return recipe_data, list_unique_ingredients, unique_ingredients_data
 
 ## Scraping the files of the domain food.com
-def scrap_food(website, filename, list_ingredient_to_remove, list_unique_ingredients, recipe_data, website_list_used ,unique_ingredients_data):
-                                                                                            
+#def scrap_food(website, filename, list_ingredient_to_remove, list_unique_ingredients, recipe_data, website_list_used ,unique_ingredients_data):
+def scrap_food(website, filename,list_ingredient_to_remove, \
+                                            list_unique_ingredients, recipe_data,website_list_used,unique_ingredients_data):                                                                                             
     try:
         soup = BeautifulSoup(open(filename), "html.parser")
     except:
@@ -220,6 +221,7 @@ def scrap_food(website, filename, list_ingredient_to_remove, list_unique_ingredi
                 ingredient_in_list_strip = ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] #Remove the plural form (s) of the ingredient
                     
             list_ingred.append(ingredient_in_list_strip) #Add the element to the ingredient list  
+            
             if ingredient_in_list_strip not in list_unique_ingredients:
                 list_unique_ingredients.append(ingredient_in_list_strip)
 #                 print("list unique ingredient", list_unique_ingredients)
@@ -233,7 +235,7 @@ def scrap_food(website, filename, list_ingredient_to_remove, list_unique_ingredi
             
     recipe_data = recipe_data.append({'Website': website, 'Recipe': recipe_name,'Prepare time': prepare_time, 'Ranking': rating, 'Reviews': review,\
                                                   'Ingredients': list_ingred}, ignore_index=True)
-    return recipe_data, list_unique_ingredients, unique_ingredients_data
+    return recipe_data,list_unique_ingredients, unique_ingredients_data
 
 #Scrap foodnetwork
 def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_ingredients, recipe_data, website_list_used ,unique_ingredients_data):
@@ -354,3 +356,4 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
     recipe_data = recipe_data.append({'Website': website, 'Recipe': recipe_name, 'Prepare time': prepare_time, 'Ranking': rating, 'Reviews': review,\
                                                   'Ingredients': list_ingred}, ignore_index=True)
     return recipe_data,list_unique_ingredients, unique_ingredients_data
+
