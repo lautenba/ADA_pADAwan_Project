@@ -70,3 +70,9 @@ We plan to mainly use the dataset "Cooking recipes". It contains the ingredients
 - Is the prediction system doable in a reasonable amount of time ? 
 
 - Are we allowed to import any libraries that can help us with our tasks ?
+
+# milestone 2
+We have separated our code into 3 parts :
+- project.ipynb : The main file for our project which contains all the results and comments.
+- scrap.py : This file contains all the functions used for scraping and returning the desired variables.
+- website_func.py : This file contains all the functions used to determine the origin of the html file (website).
