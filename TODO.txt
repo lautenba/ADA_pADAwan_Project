@@ -1,0 +1,30 @@
+- Fix the readme to comply with the milestone 2
+	- dates
+	- add more description
+
+- Remove useless prints :
+	- in scrap.py
+	- in website_func
+	- in project.ipynb
+
+- Do features Selection and explain why
+
+- Create train and validation sets
+
+- Implement 1 one linear model
+	- create model
+	- train
+	- choice of hyperparamet
+	- save it (graph, weights)
+
+- Implement more complex models
+	- create model
+	- train
+	- choice of hyperparamet
+	- save it (graph, weights)	
+
+- Analysis
+
+- Maybe create graph with networkx
+- Clean the code
+- Fix the readme for the milestone 3
