@@ -6,6 +6,11 @@
 	- in scrap.py
 	- in website_func
 	- in project.ipynb
+	
+- Try to scrap the quantities also :
+	- search the most frequent quantity words (kilos, cup, ...)
+	- convert all these words in unique unity (kilos for every one)
+	- if some unities doesn't appear in the most frequent quantitiy words, maybe we can just remove the recipe...
 
 - Do features Selection and explain why
 
