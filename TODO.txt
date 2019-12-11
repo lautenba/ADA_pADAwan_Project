@@ -8,6 +8,9 @@
 	- in project.ipynb
 	
 - Try to scrap the quantities also :
+DONE	- create list of units and quantities in reciped-data
+DONE	- create first dictionnary for converting units to grams
+	- create complete dictionnary with single word like apple, chicken chops
 	- search the most frequent quantity words (kilos, cup, ...)
 	- convert all these words in unique unity (kilos for every one)
 	- if some unities doesn't appear in the most frequent quantitiy words, maybe we can just remove the recipe...
