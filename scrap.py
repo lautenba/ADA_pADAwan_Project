@@ -4,6 +4,50 @@ from html.parser import HTMLParser
 from bs4 import BeautifulSoup
 import numpy as np
 
+#### Dictionnary quantities
+# base unit is gram
+tsp_q = 0.005 # teaspon in liter
+cup_q = 0.25 ## volume in liter
+dr = ((e,tsp_q/96) for e in ("drop","drops","dr.","dr","gt.","gt","gtt.","gtt"))
+smi = ((e,tsp_q/32) for e in ("smidgen", "smidgens", "smdg.","smdg","smi.","smi"))
+p_ = ((e,tsp_q/16) for e in ("pinch","pinches", "pn.","pn"))
+da_ = ((e,tsp_q/8) for e in ("dash","dashes","ds.","ds"))
+salt_ = ((e,tsp_q/4) for e in ("saltspoon","saltspoons","scruple","scruples","ssp.","ssp"))
+cof_ = ((e,tsp_q/2) for e in ("coffeespoon","coffeespoons","csp.","csp"))
+tsp_ = ((e,tsp_q) for e in ("teaspoon", "teaspoons","tsp.","tsp","t.","t","fluid dram","fluid drams","fl.dr." ))
+dsp_ = ((e,2*tsp_q) for e in ("dessertspoon","dessertspoons","dsp.","dsp","dssp.","dssp","dstspn.","dstspn"))
+tbsp_ = ((e,3*tsp_q) for e in  ("tablespoon", "tablespoons", "zbsp.","tbsp","T.","T"))
+
+oz_ = ((e, cup_q/8) for e in ("fluid ounces","ounce","ounces","fl.oz","oz.","oz"))
+wgf_ = ((e, cup_q/4) for e in ("wineglass","wineglasses","wgf.","wgf"))
+tcf_ = ((e, cup_q/2) for e in ("gill","gills","teacup","teacups","tcf.","tcf"))
+c_ = ((e, cup_q) for e in ("cup","cups", "C"))
+pt_ = ((e, 2*cup_q) for e in ("pint", "pints", "pt.","pt"))
+qt_ = ((e, 4*cup_q) for e in ("quart", "quarts", "qt.", "qt"))
+pott_ = ((e, 8*cup_q) for e in ("pottle", "pottles","pot.","pot"))
+gal_ = ((e, 16*cup_q) for e in ("gallon","gallons","gal.","gal"))
+
+mg_ = ((e, 0.001) for e in ("mg.","mg","milligram","milligrams"))
+cg_ = ((e, 0.01) for e in ("cg.","cg","centigram","centigrams"))
+dg_ = ((e, 0.1) for e in ("dg.","dg","decigram","decigrams"))
+g_ = ((e, 1.0) for e in  ("g.","g","gm.","gm" "gram", "grams"))
+dag_ = ((e, 10.0) for e in  ("dag.","dag","decagram","decagrams"))
+hg_ = ((e, 100.0) for e in ("hg.","hg","hectogram", "hectograms"))
+kg_ = ((e, 1000.0) for e in ("kg.","kg","kilos","kilo","kilogram","kilograms"))
+pound_ = ((e, 453.0) for e in  ("pounds", "pound"))
+
+fruit_ = ((e, 1) for e in ("olive", "olives"))
+
+measures_list = (smi ,p_,da_,salt_,cof_,tsp_,dsp_,tbsp_,oz_,wgf_,tcf_,c_,pt_,qt_,pott_,gal_,mg_,cg_,dg_,g_,dag_,hg_,kg_,pound_, fruit_)
+dict_quantities = {}
+for e in measures_list:
+    dict_quantities.update(e)
+    
+list_measures = dict_quantities.keys()
+#####################################
+
+
+
 
 def try_reading(filename, max_iter = 3):
     result= None
@@ -17,20 +61,39 @@ def try_reading(filename, max_iter = 3):
             pass
     return result
 
+# Credits to James Errico https://stackoverflow.com/questions/1806278/convert-fraction-to-float
+def convert_to_float(frac_str):
+    try:
+        return float(frac_str)
+    except ValueError:
+        try:
+            num, denom = frac_str.split('/')
+        except ValueError:
+            return None
+        try:
+            leading, num = num.split(' ')
+        except ValueError:
+            return float(num) / float(denom)        
+        if float(leading) < 0:
+            sign_mult = -1
+        else:
+            sign_mult = 1
+        return float(leading) + sign_mult * (float(num) / float(denom))
+
 ##################### SCRAPING FUNCTIONS
 def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_ingredients, recipe_data, website_list_used ,unique_ingredients_data):
                                                                                                 # used_0 correspond to the first website i.e allrecipes
     try:
         soup = BeautifulSoup(open(filename), "html.parser")
     except:
-        print("Beautifulsoup can't read the page:",filename)
+        #print("Beautifulsoup can't read the page:",filename)
         return recipe_data, list_unique_ingredients, unique_ingredients_data
                 
     recipe_name = soup.find('span', class_='itemreviewed')
                 
     #We only take recipes and not searching pages
     if recipe_name is None:
-        print("We don't care about this page: ",filename)
+        #print("We don't care about this page: ",filename)
         return recipe_data, list_unique_ingredients, unique_ingredients_data
         
     recipe_name = recipe_name.text
@@ -99,14 +162,38 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
     ingredients = soup.find('div', class_='ingredients')
     
     if ingredients is None:
-        print("No ingredients found :", filename)
+        #print("No ingredients found :", filename)
         return recipe_data,list_unique_ingredients, unique_ingredients_data
     
     all_ingredients = ingredients.find_all('li',class_="plaincharacterwrap ingredient")
+    list_units = []
+    list_quantities = []
     for ingredient in all_ingredients:
         ingredient_i = ingredient.text.replace('\n','').lower()
+        
+        unit_i = [word for word in ingredient_i.split(' ') if word in list_measures]
+        if len(unit_i) ==0:
+            print("unit not found at : ", filename)
+            #return recipe_data, list_unique_ingredients, unique_ingredients_data
+            unit_i = -1.0
+        else:
+            unit_i  = unit_i[0]
         #print('Original:', ingredient_i)
-        ingredient_i = ingredient_i.split(',')[0]
+        ingredient_i = ingredient_i.strip().split(',')[0]
+        
+        quantity_text = ingredient_i.split(" ")
+        scraped_quantity = quantity_text[0]
+        if len(quantity_text) >= 2 and "(" not in quantity_text[1] and ")" not in quantity_text[1]:
+            scraped_quantity += " "+ (quantity_text[1] if "/" in quantity_text[1] else "")
+        #print(quantity_text[0]+" " + (quantity_text[1] if "/" in quantity_text[1] else ""))
+        quantity_i = -1
+        if len(scraped_quantity) == 0:
+            quantity_i= -1.0
+        else:
+            quantity_i = convert_to_float(scraped_quantity.split("-")[0])
+            
+        list_units.append(unit_i)
+        list_quantities.append(quantity_i)
         ingredient_i = [word for word in ingredient_i.split(' ') if word not in list_ingredient_to_remove] #Clean string to only have the ingredient
         ingredient_i = ' '.join(x for x in ingredient_i if x.isalpha()) + ' '
         ingredient_i = ingredient_i.replace(' or ', '//').replace(' and ','//').replace(' with ','//').split('//') #if options, add both in the list
@@ -133,7 +220,7 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
             #print(list_ingred) 
             
     recipe_data = recipe_data.append({'Website': website, 'Recipe': recipe_name,'Prepare time': prepare_time, 'Ranking': rating, 'Reviews': review,\
-                                                  'Ingredients': list_ingred}, ignore_index=True)
+                                                  'Ingredients': list_ingred, 'Quantities':list_quantities, 'Units':list_units}, ignore_index=True)
     return recipe_data, list_unique_ingredients, unique_ingredients_data
 
 ## Scraping the files of the domain food.com
@@ -143,7 +230,7 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
     try:
         soup = BeautifulSoup(open(filename), "html.parser")
     except:
-        print("Beautifulsoup can't read the page (food.com):",filename)
+        #print("Beautifulsoup can't read the page (food.com):",filename)
         return recipe_data, list_unique_ingredients, unique_ingredients_data
 #     soup = try_reading(filename)
 #     if soup is None:
@@ -162,7 +249,7 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
     rating = soup.find('li', {"class":"current-rating"})
     # If no rating can be found, we don't use the file
     if rating is None:
-        print("No rating found")
+        #print("No rating found")
         return recipe_data, list_unique_ingredients, unique_ingredients_data
     rating = float(rating["style"][7:-2]) *5/100 # the review is a percentage of 5 stars storred in the attribute of a li block
     #print("rating", rating)   
@@ -202,12 +289,54 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
     if ingredients is None:
         print("No ingredients found :", filename)
         return recipe_data,list_unique_ingredients, unique_ingredients_data
+    list_units = []
+    list_quantities = []
+    #all_ingredients = ingredients.find_all('a')
     
-    all_ingredients = ingredients.find_all('a')
+    all_ingredients = ingredients.find_all('span', class_="ingredient")
+    #print(all_ingredients[0].text.split())
     for ingredient in all_ingredients:
-        ingredient_i = ingredient.text.replace('\n','').lower()
+        ingredient = " ".join(ingredient.text.split())
+        ingredient_i = ingredient.replace('\n','').lower()
+        
+        unit_i = [word for word in ingredient_i.split(' ') if word in list_measures]
+        if len(unit_i) ==0:
+            print("unit not found at : ", filename)
+            #return recipe_data, list_unique_ingredients, unique_ingredients_data
+            unit_i = -1.0
+        else:
+            unit_i  = unit_i[0]
         #print('Original:', ingredient_i)
-        ingredient_i = ingredient_i.split(',')[0]
+        ingredient_i = ingredient_i.strip().split(',')[0]
+        
+        quantity_text = ingredient_i.split(" ")
+        #print(ingredient_i)
+        scraped_quantity = quantity_text[0]
+        if len(quantity_text) >= 2 and "(" not in quantity_text[1] and ")" not in quantity_text[1]:
+            scraped_quantity += " "+ (quantity_text[1] if "/" in quantity_text[1] else "")
+        #print(quantity_text[0]+" " + (quantity_text[1] if "/" in quantity_text[1] else ""))
+        quantity_i = -1
+        if len(scraped_quantity) == 0:
+            quantity_i= -1.0
+        else:
+            quantity_i = convert_to_float(scraped_quantity.split("-")[0])
+            
+        
+#         quantity_text = ingredient_i.split(" ")
+#         print(ingredient_i)
+#         scraped_quantity = quantity_text[0]
+#         if len(quantity_text) >= 2:
+#             scraped_quantity += " "+ (quantity_text[1] if "/" in quantity_text[1] else "")
+#         #print(quantity_text[0]+" " + (quantity_text[1] if "/" in quantity_text[1] else ""))
+#         quantity_i = -1
+#         if len(scraped_quantity) == 0:
+#             quantity_i= -1.0
+#         else:
+#             quantity_i = convert_to_float(scraped_quantity.split("-")[0])
+            
+        list_units.append(unit_i)
+        list_quantities.append(quantity_i)
+        #print('Original:', ingredient_i)
         ingredient_i = [word for word in ingredient_i.split(' ') if word not in list_ingredient_to_remove] #Clean string to only have the ingredient
         ingredient_i = ' '.join(x for x in ingredient_i if x.isalpha()) + ' '
         ingredient_i = ingredient_i.replace(' or ', '//').replace(' and ','//').replace(' with ','//').split('//') #if options, add both in the list
@@ -234,7 +363,7 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
             #print(list_ingred) 
             
     recipe_data = recipe_data.append({'Website': website, 'Recipe': recipe_name,'Prepare time': prepare_time, 'Ranking': rating, 'Reviews': review,\
-                                                  'Ingredients': list_ingred}, ignore_index=True)
+                                                  'Ingredients': list_ingred,'Quantities':list_quantities, 'Units':list_units}, ignore_index=True)
     return recipe_data,list_unique_ingredients, unique_ingredients_data
 
 #Scrap foodnetwork
@@ -250,7 +379,7 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
                 
     #We only take recipes and not searching pages
     if recipe_name is None:
-        print("We don't care about this page (foodnetwork): ",filename)
+        #print("We don't care about this page (foodnetwork): ",filename)
         return recipe_data,list_unique_ingredients, unique_ingredients_data
         
     recipe_name = recipe_name.text
@@ -259,7 +388,7 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
     
     rating_html = soup.find('div', class_='rm-block lead hreview-aggregate review')
     if (rating_html is None) or (rating_html.find('div') is None):
-        print("No rating found")
+        #print("No rating found")
         return recipe_data, list_unique_ingredients, unique_ingredients_data 
     
     #Determine the rating in the html sequence
@@ -320,14 +449,41 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
         ingredients = soup.find('ul', class_='kv-ingred-list2')  
         
     if ingredients is None:
-        print("No ingredients found :", filename)
+        #print("No ingredients found :", filename)
         return recipe_data,list_unique_ingredients, unique_ingredients_data
-        
+    list_units = []
+    list_quantities = []
+    
     all_ingredients = ingredients.find_all('li',class_="ingredient")
+    # Loop over the found ingredients
     for ingredient in all_ingredients:
         ingredient_i = ingredient.text.replace('\n','').lower()
+        
+        unit_i = [word for word in ingredient_i.split(' ') if word in list_measures]
+        if len(unit_i) ==0:
+            print("unit not found at : ", filename)
+            #return recipe_data, list_unique_ingredients, unique_ingredients_data
+            unit_i = -1.0
+        else:
+            unit_i  = unit_i[0]
         #print('Original:', ingredient_i)
-        ingredient_i = ingredient_i.split(',')[0]
+        ingredient_i = ingredient_i.strip().split(',')[0]
+        
+        quantity_text = ingredient_i.split(" ")
+        scraped_quantity = quantity_text[0]
+        if len(quantity_text) >= 2 and "(" not in quantity_text[1] and ")" not in quantity_text[1]:
+            scraped_quantity += " "+ (quantity_text[1] if "/" in quantity_text[1] else "")
+        #print(quantity_text[0]+" " + (quantity_text[1] if "/" in quantity_text[1] else ""))
+        quantity_i = -1
+        if len(scraped_quantity) == 0:
+            quantity_i= -1.0
+        else:
+            quantity_i = convert_to_float(scraped_quantity.split("-")[0])
+        
+        list_units.append(unit_i)
+        list_quantities.append(quantity_i)
+        #print('Original:', ingredient_i)
+        
         ingredient_i = [word for word in ingredient_i.split(' ') if word not in list_ingredient_to_remove] #Clean string to only have the ingredient
         ingredient_i = ' '.join(x for x in ingredient_i if x.isalpha()) + ' '
         ingredient_i = ingredient_i.replace(' or ', '//').replace(' and ','//').replace(' with ','//').split('//') #if options, add both in the list
@@ -354,6 +510,6 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
             
     #print(list_ingred)        
     recipe_data = recipe_data.append({'Website': website, 'Recipe': recipe_name, 'Prepare time': prepare_time, 'Ranking': rating, 'Reviews': review,\
-                                                  'Ingredients': list_ingred}, ignore_index=True)
+                                                  'Ingredients': list_ingred,'Quantities':list_quantities, 'Units':list_units}, ignore_index=True)
     return recipe_data,list_unique_ingredients, unique_ingredients_data
 
