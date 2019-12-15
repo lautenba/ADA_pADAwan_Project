@@ -3,6 +3,7 @@ import shutil
 from html.parser import HTMLParser
 from bs4 import BeautifulSoup
 import numpy as np
+import pandas as pd
 
 #### Dictionnary quantities
 # base unit is gram
@@ -34,7 +35,7 @@ g_ = ((e, 1.0) for e in  ("g.","g","gm.","gm" "gram", "grams"))
 dag_ = ((e, 10.0) for e in  ("dag.","dag","decagram","decagrams"))
 hg_ = ((e, 100.0) for e in ("hg.","hg","hectogram", "hectograms"))
 kg_ = ((e, 1000.0) for e in ("kg.","kg","kilos","kilo","kilogram","kilograms"))
-pound_ = ((e, 453.0) for e in  ("pounds", "pound"))
+pound_ = ((e, 453.0) for e in  ("lb", "lb.", "lbs", "lbs.","pounds", "pound"))
 
 fruit_ = ((e, 1) for e in ("olive", "olives"))
 
@@ -45,21 +46,13 @@ for e in measures_list:
     
 list_measures = dict_quantities.keys()
 #####################################
+### scraped fruit quantity
+fruit_quantity = pd.read_pickle('data_pickles/fruit_quantity.pkl').set_index("Fruit").T.to_dict("list")
+list_fruit = list(fruit_quantity.keys())
+#####
+### string to keep for converting to float
+s_float = set("01234567890/ ")
 
-
-
-
-def try_reading(filename, max_iter = 3):
-    result= None
-    i = 0
-    while (result is None) or i <= max_iter:
-        i+=1
-        try:
-            result = BeautifulSoup(open(filename), "html.parser") 
-        except:
-            print("Error Reading")
-            pass
-    return result
 
 # Credits to James Errico https://stackoverflow.com/questions/1806278/convert-fraction-to-float
 def convert_to_float(frac_str):
@@ -78,7 +71,7 @@ def convert_to_float(frac_str):
             sign_mult = -1
         else:
             sign_mult = 1
-        return float(leading) + sign_mult * (float(num) / float(denom))
+        return "%.3f" % (float(leading) + sign_mult * (float(num) / float(denom)))
 
 ##################### SCRAPING FUNCTIONS
 def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_ingredients, recipe_data, website_list_used ,unique_ingredients_data):
@@ -88,7 +81,7 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
     except:
         #print("Beautifulsoup can't read the page:",filename)
         return recipe_data, list_unique_ingredients, unique_ingredients_data
-                
+    
     recipe_name = soup.find('span', class_='itemreviewed')
                 
     #We only take recipes and not searching pages
@@ -119,6 +112,7 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
     #Find the preparation time:
     prepare_time = np.nan
     soup1 = soup.find('span', class_='totalTime')
+    
     if soup1 is not None:
                 
         prepare_time_html = soup1.find('span', class_='value-title')
@@ -173,7 +167,7 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
         
         unit_i = [word for word in ingredient_i.split(' ') if word in list_measures]
         if len(unit_i) ==0:
-            print("unit not found at : ", filename)
+            #print("unit not found at : ", filename)
             #return recipe_data, list_unique_ingredients, unique_ingredients_data
             unit_i = -1.0
         else:
@@ -185,15 +179,17 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
         scraped_quantity = quantity_text[0]
         if len(quantity_text) >= 2 and "(" not in quantity_text[1] and ")" not in quantity_text[1]:
             scraped_quantity += " "+ (quantity_text[1] if "/" in quantity_text[1] else "")
-        #print(quantity_text[0]+" " + (quantity_text[1] if "/" in quantity_text[1] else ""))
+            
         quantity_i = -1
         if len(scraped_quantity) == 0:
             quantity_i= -1.0
         else:
-            quantity_i = convert_to_float(scraped_quantity.split("-")[0])
-            
-        list_units.append(unit_i)
-        list_quantities.append(quantity_i)
+            try:
+                quantity_i = convert_to_float((''.join([c for c in scraped_quantity.split("-")[0] if c in s_float])).strip())
+            except:
+                print(scraped_quantity.split("-")[0])
+                quantity_i= -1.0
+        
         ingredient_i = [word for word in ingredient_i.split(' ') if word not in list_ingredient_to_remove] #Clean string to only have the ingredient
         ingredient_i = ' '.join(x for x in ingredient_i if x.isalpha()) + ' '
         ingredient_i = ingredient_i.replace(' or ', '//').replace(' and ','//').replace(' with ','//').split('//') #if options, add both in the list
@@ -205,7 +201,16 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
                 continue
             if ingredient_in_list_strip[len(ingredient_in_list_strip)-1] == 's' and ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] in list_unique_ingredients:
                 ingredient_in_list_strip = ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] #Remove the plural form (s) of the ingredient
-                    
+            ## If the ingredient is in the list of fruit quantities scraped 
+            if ingredient_in_list_strip in list_fruit and (unit_i == -1.0 or quantity_i == -1.0):
+                #print("lalala")
+                unit_i = "g"
+                if quantity_i != -1.0 and quantity_i is not None: ## if 2 bananas
+                    quantity_i = float(quantity_i)*fruit_quantity[ingredient_in_list_strip][0]
+                else:
+                    quantity_i = fruit_quantity[ingredient_in_list_strip][0]
+            ###
+                
             list_ingred.append(ingredient_in_list_strip) #Add the element to the ingredient list  
             if ingredient_in_list_strip not in list_unique_ingredients:
                 list_unique_ingredients.append(ingredient_in_list_strip)
@@ -218,7 +223,9 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
                             
                     
             #print(list_ingred) 
-            
+        ### add the unit and quantity at the end
+        list_units.append(unit_i)
+        list_quantities.append(quantity_i)
     recipe_data = recipe_data.append({'Website': website, 'Recipe': recipe_name,'Prepare time': prepare_time, 'Ranking': rating, 'Reviews': review,\
                                                   'Ingredients': list_ingred, 'Quantities':list_quantities, 'Units':list_units}, ignore_index=True)
     return recipe_data, list_unique_ingredients, unique_ingredients_data
@@ -235,13 +242,12 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
 #     soup = try_reading(filename)
 #     if soup is None:
 #         print("Beautifulsoup can't read the page (food.com):",filename)
-#         return recipe_data, list_unique_ingredients, unique_ingredients_data
-                
+#         return recipe_data, list_unique_ingredients, unique_ingredients_data                
     recipe_name = soup.find('h1', class_='fn')
                 
     #We only take recipes and not searching pages
     if recipe_name is None:
-        print("No name found : We don't care about this page: ",filename)
+#         print("No name found : We don't care about this page: ",filename)
         return recipe_data, list_unique_ingredients, unique_ingredients_data
         
     recipe_name = recipe_name.text
@@ -287,7 +293,7 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
     ingredients = soup.find('div', class_='pod ingredients')
     
     if ingredients is None:
-        print("No ingredients found :", filename)
+        #print("No ingredients found :", filename)
         return recipe_data,list_unique_ingredients, unique_ingredients_data
     list_units = []
     list_quantities = []
@@ -301,7 +307,7 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
         
         unit_i = [word for word in ingredient_i.split(' ') if word in list_measures]
         if len(unit_i) ==0:
-            print("unit not found at : ", filename)
+            #print("unit not found at : ", filename)
             #return recipe_data, list_unique_ingredients, unique_ingredients_data
             unit_i = -1.0
         else:
@@ -319,23 +325,13 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
         if len(scraped_quantity) == 0:
             quantity_i= -1.0
         else:
-            quantity_i = convert_to_float(scraped_quantity.split("-")[0])
-            
+            try:
+                quantity_i = convert_to_float((''.join([c for c in scraped_quantity.split("-")[0] if c in s_float])).strip())
+            except:
+                print(scraped_quantity.split("-")[0])
+                quantity_i= -1.0
         
-#         quantity_text = ingredient_i.split(" ")
-#         print(ingredient_i)
-#         scraped_quantity = quantity_text[0]
-#         if len(quantity_text) >= 2:
-#             scraped_quantity += " "+ (quantity_text[1] if "/" in quantity_text[1] else "")
-#         #print(quantity_text[0]+" " + (quantity_text[1] if "/" in quantity_text[1] else ""))
-#         quantity_i = -1
-#         if len(scraped_quantity) == 0:
-#             quantity_i= -1.0
-#         else:
-#             quantity_i = convert_to_float(scraped_quantity.split("-")[0])
-            
-        list_units.append(unit_i)
-        list_quantities.append(quantity_i)
+        
         #print('Original:', ingredient_i)
         ingredient_i = [word for word in ingredient_i.split(' ') if word not in list_ingredient_to_remove] #Clean string to only have the ingredient
         ingredient_i = ' '.join(x for x in ingredient_i if x.isalpha()) + ' '
@@ -349,6 +345,17 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
             if ingredient_in_list_strip[len(ingredient_in_list_strip)-1] == 's' and ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] in list_unique_ingredients:
                 ingredient_in_list_strip = ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] #Remove the plural form (s) of the ingredient
                     
+                    
+            ## If the ingredient is in the list of fruit quantities scraped 
+            if ingredient_in_list_strip in list_fruit and (unit_i == -1.0 or quantity_i == -1.0):
+                #print("lalala ",ingredient_in_list_strip, "  ,", filename)
+                unit_i = "g"
+                if quantity_i != -1.0 and quantity_i is not None: ## if 2 bananas
+                    quantity_i = float(quantity_i)*fruit_quantity[ingredient_in_list_strip][0]
+                else:
+                    quantity_i = fruit_quantity[ingredient_in_list_strip][0]
+            ###
+                
             list_ingred.append(ingredient_in_list_strip) #Add the element to the ingredient list  
             
             if ingredient_in_list_strip not in list_unique_ingredients:
@@ -361,7 +368,8 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
                 unique_ingredients_data.at[ingredient_index,'Count'] = unique_ingredients_data['Count'][ingredient_index] + 1
                     
             #print(list_ingred) 
-            
+        list_units.append(unit_i)
+        list_quantities.append(quantity_i)
     recipe_data = recipe_data.append({'Website': website, 'Recipe': recipe_name,'Prepare time': prepare_time, 'Ranking': rating, 'Reviews': review,\
                                                   'Ingredients': list_ingred,'Quantities':list_quantities, 'Units':list_units}, ignore_index=True)
     return recipe_data,list_unique_ingredients, unique_ingredients_data
@@ -461,7 +469,7 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
         
         unit_i = [word for word in ingredient_i.split(' ') if word in list_measures]
         if len(unit_i) ==0:
-            print("unit not found at : ", filename)
+            #print("unit not found at : ", filename)
             #return recipe_data, list_unique_ingredients, unique_ingredients_data
             unit_i = -1.0
         else:
@@ -472,16 +480,21 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
         quantity_text = ingredient_i.split(" ")
         scraped_quantity = quantity_text[0]
         if len(quantity_text) >= 2 and "(" not in quantity_text[1] and ")" not in quantity_text[1]:
-            scraped_quantity += " "+ (quantity_text[1] if "/" in quantity_text[1] else "")
+            if set(quantity_text[1]) <= s_float: # if all char in quantity_text belongs to predefined character
+                scraped_quantity += " "+ (quantity_text[1] if "/" in quantity_text[1] else "")
         #print(quantity_text[0]+" " + (quantity_text[1] if "/" in quantity_text[1] else ""))
         quantity_i = -1
         if len(scraped_quantity) == 0:
             quantity_i= -1.0
         else:
-            quantity_i = convert_to_float(scraped_quantity.split("-")[0])
+            try:
+                
+                quantity_i = convert_to_float((''.join([c for c in scraped_quantity.split("-")[0] if c in s_float])).strip())
+            except:
+                print(scraped_quantity.split("-")[0])
+                quantity_i= -1.0
+                
         
-        list_units.append(unit_i)
-        list_quantities.append(quantity_i)
         #print('Original:', ingredient_i)
         
         ingredient_i = [word for word in ingredient_i.split(' ') if word not in list_ingredient_to_remove] #Clean string to only have the ingredient
@@ -495,7 +508,19 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
                 continue
             if ingredient_in_list_strip[len(ingredient_in_list_strip)-1] == 's' and ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] in list_unique_ingredients:
                 ingredient_in_list_strip = ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] #Remove the plural form (s) of the ingredient
-                    
+                
+                
+            ## If the ingredient is in the list of fruit quantities scraped 
+            if ingredient_in_list_strip in list_fruit and (unit_i == -1.0 or quantity_i == -1.0):
+                #print("lalala")
+                unit_i = "g"
+                if quantity_i != -1.0 and quantity_i is not None: ## if 2 bananas
+                    quantity_i = float(quantity_i)*fruit_quantity[ingredient_in_list_strip][0]
+                else:
+                    quantity_i = fruit_quantity[ingredient_in_list_strip][0]
+            ###
+            
+            
             list_ingred.append(ingredient_in_list_strip) #Add the element to the ingredient list  
             if ingredient_in_list_strip not in list_unique_ingredients:
                 list_unique_ingredients.append(ingredient_in_list_strip)
@@ -507,7 +532,9 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
                 unique_ingredients_data.at[ingredient_index,'Count'] = unique_ingredients_data['Count'][ingredient_index] + 1
                             
                     
-            
+        
+        list_units.append(unit_i)
+        list_quantities.append(quantity_i)
     #print(list_ingred)        
     recipe_data = recipe_data.append({'Website': website, 'Recipe': recipe_name, 'Prepare time': prepare_time, 'Ranking': rating, 'Reviews': review,\
                                                   'Ingredients': list_ingred,'Quantities':list_quantities, 'Units':list_units}, ignore_index=True)
