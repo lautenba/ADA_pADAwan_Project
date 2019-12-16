@@ -19,7 +19,9 @@ tsp_ = ((e,tsp_q) for e in ("teaspoon", "teaspoons","tsp.","tsp","t.","t","fluid
 dsp_ = ((e,2*tsp_q) for e in ("dessertspoon","dessertspoons","dsp.","dsp","dssp.","dssp","dstspn.","dstspn"))
 tbsp_ = ((e,3*tsp_q) for e in  ("tablespoon", "tablespoons", "zbsp.","tbsp","T.","T"))
 
-oz_ = ((e, cup_q/8) for e in ("fluid ounces","ounce","ounces","fl.oz","oz.","oz"))
+liter_ = ((e,1.0) for e in ("liter", "liter)", "liters", "liters", "litre", "litre)", "litres", "litres)"))
+          
+oz_ = ((e, cup_q/8) for e in ("fluid ounces","ounce","ounces)", "ounce)","ounces","fl.oz","oz.","oz"))
 wgf_ = ((e, cup_q/4) for e in ("wineglass","wineglasses","wgf.","wgf"))
 tcf_ = ((e, cup_q/2) for e in ("gill","gills","teacup","teacups","tcf.","tcf"))
 c_ = ((e, cup_q) for e in ("cup","cups", "C"))
@@ -35,20 +37,20 @@ g_ = ((e, 1.0) for e in  ("g.","g","gm.","gm" "gram", "grams"))
 dag_ = ((e, 10.0) for e in  ("dag.","dag","decagram","decagrams"))
 hg_ = ((e, 100.0) for e in ("hg.","hg","hectogram", "hectograms"))
 kg_ = ((e, 1000.0) for e in ("kg.","kg","kilos","kilo","kilogram","kilograms"))
-pound_ = ((e, 453.0) for e in  ("lb", "lb.", "lbs", "lbs.","pounds", "pound"))
+pound_ = ((e, 453.0) for e in  ("lb", "lb.", "lbs", "lbs.","pounds", "pound","pound)", "pounds)"))
 
 fruit_ = ((e, 1) for e in ("olive", "olives"))
 
-measures_list = (smi ,p_,da_,salt_,cof_,tsp_,dsp_,tbsp_,oz_,wgf_,tcf_,c_,pt_,qt_,pott_,gal_,mg_,cg_,dg_,g_,dag_,hg_,kg_,pound_, fruit_)
+measures_list = (smi ,p_,da_,salt_,cof_,tsp_,dsp_,tbsp_ ,liter_,oz_,wgf_,tcf_,c_,pt_,qt_,pott_,gal_,mg_,cg_,dg_,g_,dag_,hg_,kg_,pound_, fruit_)
 dict_quantities = {}
 for e in measures_list:
     dict_quantities.update(e)
     
 list_measures = dict_quantities.keys()
 #####################################
-### scraped fruit quantity
-fruit_quantity = pd.read_pickle('data_pickles/fruit_quantity.pkl').set_index("Fruit").T.to_dict("list")
-list_fruit = list(fruit_quantity.keys())
+### scraped 
+augmented_quantity = pd.read_pickle('data_pickles/augmented_quantity.pkl').set_index("Food").T.to_dict("list")
+list_augmented = list(augmented_quantity.keys())
 #####
 ### string to keep for converting to float
 s_float = set("01234567890/ ")
@@ -107,7 +109,6 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
         review = int(review_html.replace(',',''))
     else:
         review = 0
-        #print('Reviews :',review)
     
     #Find the preparation time:
     prepare_time = np.nan
@@ -167,7 +168,7 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
         
         unit_i = [word for word in ingredient_i.split(' ') if word in list_measures]
         if len(unit_i) ==0:
-            #print("unit not found at : ", filename)
+            #print("unit not found at : ", ingredient_i.split(' '))
             #return recipe_data, list_unique_ingredients, unique_ingredients_data
             unit_i = -1.0
         else:
@@ -180,7 +181,7 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
         if len(quantity_text) >= 2 and "(" not in quantity_text[1] and ")" not in quantity_text[1]:
             scraped_quantity += " "+ (quantity_text[1] if "/" in quantity_text[1] else "")
             
-        quantity_i = -1
+        quantity_i = -1.0
         if len(scraped_quantity) == 0:
             quantity_i= -1.0
         else:
@@ -201,14 +202,15 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
                 continue
             if ingredient_in_list_strip[len(ingredient_in_list_strip)-1] == 's' and ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] in list_unique_ingredients:
                 ingredient_in_list_strip = ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] #Remove the plural form (s) of the ingredient
-            ## If the ingredient is in the list of fruit quantities scraped 
-            if ingredient_in_list_strip in list_fruit and (unit_i == -1.0 or quantity_i == -1.0):
-                #print("lalala")
-                unit_i = "g"
-                if quantity_i != -1.0 and quantity_i is not None: ## if 2 bananas
-                    quantity_i = float(quantity_i)*fruit_quantity[ingredient_in_list_strip][0]
+             ## If the ingredient is in the list of fruit quantities scraped and something is missing
+            if ingredient_in_list_strip in list_augmented and ((unit_i == -1.0) ^ (quantity_i is None or quantity_i == -1.0)):
+                ## if 2 bananas, quantity is known but unit not
+                if quantity_i != -1.0 and quantity_i is not None: 
+                    quantity_i = float(quantity_i)*augmented_quantity[ingredient_in_list_strip][0]
+                    unit_i = augmented_quantity[ingredient_in_list_strip][1]
                 else:
-                    quantity_i = fruit_quantity[ingredient_in_list_strip][0]
+                    # if quantiy is missing -1.0
+                    quantity_i = -1.0
             ###
                 
             list_ingred.append(ingredient_in_list_strip) #Add the element to the ingredient list  
@@ -321,7 +323,7 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
         if len(quantity_text) >= 2 and "(" not in quantity_text[1] and ")" not in quantity_text[1]:
             scraped_quantity += " "+ (quantity_text[1] if "/" in quantity_text[1] else "")
         #print(quantity_text[0]+" " + (quantity_text[1] if "/" in quantity_text[1] else ""))
-        quantity_i = -1
+        quantity_i = -1.0
         if len(scraped_quantity) == 0:
             quantity_i= -1.0
         else:
@@ -345,16 +347,17 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
             if ingredient_in_list_strip[len(ingredient_in_list_strip)-1] == 's' and ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] in list_unique_ingredients:
                 ingredient_in_list_strip = ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] #Remove the plural form (s) of the ingredient
                     
-                    
-            ## If the ingredient is in the list of fruit quantities scraped 
-            if ingredient_in_list_strip in list_fruit and (unit_i == -1.0 or quantity_i == -1.0):
-                #print("lalala ",ingredient_in_list_strip, "  ,", filename)
-                unit_i = "g"
-                if quantity_i != -1.0 and quantity_i is not None: ## if 2 bananas
-                    quantity_i = float(quantity_i)*fruit_quantity[ingredient_in_list_strip][0]
+              ## If the ingredient is in the list of fruit quantities scraped and something is missing
+            if ingredient_in_list_strip in list_augmented and ((unit_i == -1.0) ^ (quantity_i is None or quantity_i == -1.0)):
+                ## if 2 bananas, quantity is known but unit not
+                if quantity_i != -1.0 and quantity_i is not None: 
+                    quantity_i = float(quantity_i)*augmented_quantity[ingredient_in_list_strip][0]
+                    unit_i = augmented_quantity[ingredient_in_list_strip][1]
                 else:
-                    quantity_i = fruit_quantity[ingredient_in_list_strip][0]
+                    # if quantiy is missing -1.0
+                    quantity_i = -1.0
             ###
+                
                 
             list_ingred.append(ingredient_in_list_strip) #Add the element to the ingredient list  
             
@@ -483,7 +486,7 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
             if set(quantity_text[1]) <= s_float: # if all char in quantity_text belongs to predefined character
                 scraped_quantity += " "+ (quantity_text[1] if "/" in quantity_text[1] else "")
         #print(quantity_text[0]+" " + (quantity_text[1] if "/" in quantity_text[1] else ""))
-        quantity_i = -1
+        quantity_i = -1.0
         if len(scraped_quantity) == 0:
             quantity_i= -1.0
         else:
@@ -510,16 +513,17 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
                 ingredient_in_list_strip = ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] #Remove the plural form (s) of the ingredient
                 
                 
-            ## If the ingredient is in the list of fruit quantities scraped 
-            if ingredient_in_list_strip in list_fruit and (unit_i == -1.0 or quantity_i == -1.0):
-                #print("lalala")
-                unit_i = "g"
-                if quantity_i != -1.0 and quantity_i is not None: ## if 2 bananas
-                    quantity_i = float(quantity_i)*fruit_quantity[ingredient_in_list_strip][0]
+             ## If the ingredient is in the list of fruit quantities scraped and something is missing
+            if ingredient_in_list_strip in list_augmented and ((unit_i == -1.0) ^ (quantity_i is None or quantity_i == -1.0)):
+                ## if 2 bananas, quantity is known but unit not
+                if quantity_i != -1.0 and quantity_i is not None: 
+                    quantity_i = float(quantity_i)*augmented_quantity[ingredient_in_list_strip][0]
+                    unit_i = augmented_quantity[ingredient_in_list_strip][1]
                 else:
-                    quantity_i = fruit_quantity[ingredient_in_list_strip][0]
+                    # if quantiy is missing -1.0
+                    quantity_i = -1.0
             ###
-            
+                            
             
             list_ingred.append(ingredient_in_list_strip) #Add the element to the ingredient list  
             if ingredient_in_list_strip not in list_unique_ingredients:
