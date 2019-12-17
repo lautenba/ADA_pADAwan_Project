@@ -7,8 +7,8 @@ import pandas as pd
 
 #### Dictionnary quantities
 # base unit is gram
-tsp_q = 0.005 # teaspon in liter
-cup_q = 0.25 ## volume in liter
+tsp_q = 5 # teaspon in liter
+cup_q = 250 ## volume in liter
 dr = ((e,tsp_q/96) for e in ("drop","drops","dr.","dr","gt.","gt","gtt.","gtt"))
 smi = ((e,tsp_q/32) for e in ("smidgen", "smidgens", "smdg.","smdg","smi.","smi"))
 p_ = ((e,tsp_q/16) for e in ("pinch","pinches", "pn.","pn"))
@@ -20,6 +20,7 @@ dsp_ = ((e,2*tsp_q) for e in ("dessertspoon","dessertspoons","dsp.","dsp","dssp.
 tbsp_ = ((e,3*tsp_q) for e in  ("tablespoon", "tablespoons", "zbsp.","tbsp","T.","T"))
 
 liter_ = ((e,1.0) for e in ("liter", "liter)", "liters", "liters", "litre", "litre)", "litres", "litres)"))
+ml_ = ((e, 0.001) for e in ("ml.","ml","milliliter","milliliters"))
           
 oz_ = ((e, cup_q/8) for e in ("fluid ounces","ounce","ounces)", "ounce)","ounces","fl.oz","oz.","oz"))
 wgf_ = ((e, cup_q/4) for e in ("wineglass","wineglasses","wgf.","wgf"))
@@ -41,7 +42,7 @@ pound_ = ((e, 453.0) for e in  ("lb", "lb.", "lbs", "lbs.","pounds", "pound","po
 
 fruit_ = ((e, 1) for e in ("olive", "olives"))
 
-measures_list = (smi ,p_,da_,salt_,cof_,tsp_,dsp_,tbsp_ ,liter_,oz_,wgf_,tcf_,c_,pt_,qt_,pott_,gal_,mg_,cg_,dg_,g_,dag_,hg_,kg_,pound_, fruit_)
+measures_list = (smi ,p_,da_,salt_,cof_,tsp_,dsp_,tbsp_ ,liter_, ml_,oz_,wgf_,tcf_,c_,pt_,qt_,pott_,gal_,mg_,cg_,dg_,g_,dag_,hg_,kg_,pound_, fruit_)
 dict_quantities = {}
 for e in measures_list:
     dict_quantities.update(e)
@@ -55,6 +56,10 @@ list_augmented = list(augmented_quantity.keys())
 ### string to keep for converting to float
 s_float = set("01234567890/ ")
 
+
+## Return the dictionnary of conversion of the units
+def get_dict_quantities():
+    return dict_quantities
 
 # Credits to James Errico https://stackoverflow.com/questions/1806278/convert-fraction-to-float
 def convert_to_float(frac_str):
