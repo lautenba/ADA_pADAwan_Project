@@ -24,7 +24,7 @@ centil_ = ((e,100.0) for e in ("cl","cl.","centiliter", "centiliter)", "centilit
 decil_ = ((e,10.0) for e in ("dl", "dl.", "deciliter", "deciliter)", "deciliters)", "deciliters", "decilitre", "decilitre)", "decilitres", "decilitres)"))
 ml_ = ((e, 1.0) for e in ("ml.","ml","milliliter","milliliters"))
           
-oz_ = ((e, cup_q/8) for e in ("fluid ounces","ounce","ounces)", "ounce)","ounces","fl.oz","oz.","oz"))
+oz_ = ((e, cup_q/8) for e in ("fluid ounces","ounce","ounces","fl.oz","oz.","oz")) #"ounces)", "ounce)",
 wgf_ = ((e, cup_q/4) for e in ("wineglass","wineglasses","wgf.","wgf"))
 tcf_ = ((e, cup_q/2) for e in ("gill","gills","teacup","teacups","tcf.","tcf"))
 c_ = ((e, cup_q) for e in ("cup","cups", "C"))
@@ -219,8 +219,10 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
                     # if quantiy is missing -1.0
                     quantity_i = -1.0
             ###
+             ###############################################     
+            if ingredient_in_list_strip is not None:    
+                list_ingred.append(ingredient_in_list_strip) #Add the element to the ingredient list  
                 
-            list_ingred.append(ingredient_in_list_strip) #Add the element to the ingredient list  
             if ingredient_in_list_strip not in list_unique_ingredients:
                 list_unique_ingredients.append(ingredient_in_list_strip)
 #                 print("list unique ingredient", list_unique_ingredients)
@@ -230,11 +232,14 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
                 ingredient_index = unique_ingredients_data[unique_ingredients_data['Ingredient']== ingredient_in_list_strip].index[0]
                 unique_ingredients_data.at[ingredient_index,'Count'] = unique_ingredients_data['Count'][ingredient_index] + 1
                             
-                    
+             #print(list_ingred) 
+            if ingredient_in_list_strip is not None:
+                list_units.append(unit_i)
+                list_quantities.append(quantity_i)       
             #print(list_ingred) 
         ### add the unit and quantity at the end
-        list_units.append(unit_i)
-        list_quantities.append(quantity_i)
+#         list_units.append(unit_i)
+#         list_quantities.append(quantity_i)
     recipe_data = recipe_data.append({'Website': website, 'Recipe': recipe_name,'Prepare time': prepare_time, 'Ranking': rating, 'Reviews': review,\
                                                   'Ingredients': list_ingred, 'Quantities':list_quantities, 'Units':list_units}, ignore_index=True)
     return recipe_data, list_unique_ingredients, unique_ingredients_data
@@ -354,7 +359,7 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
             if ingredient_in_list_strip[len(ingredient_in_list_strip)-1] == 's' and ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] in list_unique_ingredients:
                 ingredient_in_list_strip = ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] #Remove the plural form (s) of the ingredient
                     
-              ## If the ingredient is in the list of fruit quantities scraped and something is missing
+              ## If the ingredient is in the list of fruit quantities scraped and something is missing but only
             if ingredient_in_list_strip in list_augmented and ((unit_i == -1.0) ^ (quantity_i is None or quantity_i == -1.0)):
                 ## if 2 bananas, quantity is known but unit not
                 if quantity_i != -1.0 and quantity_i is not None: 
@@ -364,9 +369,9 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
                     # if quantiy is missing -1.0
                     quantity_i = -1.0
             ###
-                
-                
-            list_ingred.append(ingredient_in_list_strip) #Add the element to the ingredient list  
+           ###############################################     
+            if ingredient_in_list_strip is not None:    
+                list_ingred.append(ingredient_in_list_strip) #Add the element to the ingredient list  
             
             if ingredient_in_list_strip not in list_unique_ingredients:
                 list_unique_ingredients.append(ingredient_in_list_strip)
@@ -378,8 +383,11 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
                 unique_ingredients_data.at[ingredient_index,'Count'] = unique_ingredients_data['Count'][ingredient_index] + 1
                     
             #print(list_ingred) 
-        list_units.append(unit_i)
-        list_quantities.append(quantity_i)
+            if ingredient_in_list_strip is not None:
+                list_units.append(unit_i)
+                list_quantities.append(quantity_i)
+        if len(list_units) != len(list_ingred):
+            print(filename)
     recipe_data = recipe_data.append({'Website': website, 'Recipe': recipe_name,'Prepare time': prepare_time, 'Ranking': rating, 'Reviews': review,\
                                                   'Ingredients': list_ingred,'Quantities':list_quantities, 'Units':list_units}, ignore_index=True)
     return recipe_data,list_unique_ingredients, unique_ingredients_data
@@ -531,8 +539,11 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
                     quantity_i = -1.0
             ###
                             
-            
-            list_ingred.append(ingredient_in_list_strip) #Add the element to the ingredient list  
+             ###############################################     
+            if ingredient_in_list_strip is not None:    
+                list_ingred.append(ingredient_in_list_strip) #Add the element to the ingredient list  
+                
+                
             if ingredient_in_list_strip not in list_unique_ingredients:
                 list_unique_ingredients.append(ingredient_in_list_strip)
 #                 print("list unique ingredient", list_unique_ingredients)
@@ -542,10 +553,11 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
                 ingredient_index = unique_ingredients_data[unique_ingredients_data['Ingredient']== ingredient_in_list_strip].index[0]
                 unique_ingredients_data.at[ingredient_index,'Count'] = unique_ingredients_data['Count'][ingredient_index] + 1
                             
-                    
-        
-        list_units.append(unit_i)
-        list_quantities.append(quantity_i)
+             #print(list_ingred) 
+            if ingredient_in_list_strip is not None:
+                list_units.append(unit_i)
+                list_quantities.append(quantity_i)       
+
     #print(list_ingred)        
     recipe_data = recipe_data.append({'Website': website, 'Recipe': recipe_name, 'Prepare time': prepare_time, 'Ranking': rating, 'Reviews': review,\
                                                   'Ingredients': list_ingred,'Quantities':list_quantities, 'Units':list_units}, ignore_index=True)
