@@ -4,6 +4,7 @@ from html.parser import HTMLParser
 from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
+from collections import OrderedDict # for removing redundant words in ingredient
 
 #### Dictionnary quantities
 # base unit is gram
@@ -52,16 +53,23 @@ for e in measures_list:
 list_measures = dict_quantities.keys()
 #####################################
 ### scraped 
-augmented_quantity = pd.read_pickle('data_pickles/augmented_quantity.pkl').set_index("Food").T.to_dict("list")
-list_augmented = list(augmented_quantity.keys())
+augmented_quantity_dict = pd.read_pickle('data_pickles/augmented_quantity.pkl').set_index("Food").T.to_dict("list")
+list_augmented = list(augmented_quantity_dict.keys())
 #####
 ### string to keep for converting to float
 s_float = set("01234567890/ ")
 
-
 ## Return the dictionnary of conversion of the units
 def get_dict_quantities():
     return dict_quantities
+
+# Credits to ekhumoro https://stackoverflow.com/questions/7794208/how-can-i-remove-duplicate-words-in-a-string-with-python
+def removeDoubles(s):
+    return ' '.join(OrderedDict.fromkeys(s.split()))
+#     to Markus https://stackoverflow.com/a/7794619
+#     words = s.split()
+#     return ' '.join(sorted(set(words), key=words.index))
+
 
 # Credits to James Errico https://stackoverflow.com/questions/1806278/convert-fraction-to-float
 def convert_to_float(frac_str):
@@ -197,24 +205,30 @@ def scrap_allrecipes(website, filename, list_ingredient_to_remove, list_unique_i
             except:
                 print(scraped_quantity.split("-")[0])
                 quantity_i= -1.0
-        
+                
         ingredient_i = [word for word in ingredient_i.split(' ') if word not in list_ingredient_to_remove] #Clean string to only have the ingredient
         ingredient_i = ' '.join(x for x in ingredient_i if x.isalpha()) + ' '
         ingredient_i = ingredient_i.replace(' or ', '//').replace(' and ','//').replace(' with ','//').split('//') #if options, add both in the list
         #print('After removing:              ', ingredient_i,"\n")
-                    
         for ingredient_in_list in ingredient_i:
-            ingredient_in_list_strip = ingredient_in_list.strip()                        
-            if ingredient_in_list_strip == '':
+            ingredient_in_list_strip = ingredient_in_list.strip()    
+            
+             ### remove doubles 
+            ingredient_in_list_strip = removeDoubles(ingredient_in_list_strip)
+            #### don't need to add twice the amoount
+            if ingredient_in_list_strip == '' or str(ingredient_in_list_strip) in list_ingred:
                 continue
+            ####
+            
+            
             if ingredient_in_list_strip[len(ingredient_in_list_strip)-1] == 's' and ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] in list_unique_ingredients:
                 ingredient_in_list_strip = ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] #Remove the plural form (s) of the ingredient
              ## If the ingredient is in the list of fruit quantities scraped and something is missing
             if ingredient_in_list_strip in list_augmented and ((unit_i == -1.0) ^ (quantity_i is None or quantity_i == -1.0)):
                 ## if 2 bananas, quantity is known but unit not
                 if quantity_i != -1.0 and quantity_i is not None: 
-                    quantity_i = float(quantity_i)*augmented_quantity[ingredient_in_list_strip][0]
-                    unit_i = augmented_quantity[ingredient_in_list_strip][1]
+                    quantity_i = float(quantity_i)*augmented_quantity_dict[ingredient_in_list_strip][0]
+                    unit_i = augmented_quantity_dict[ingredient_in_list_strip][1]
                 else:
                     # if quantiy is missing -1.0
                     quantity_i = -1.0
@@ -351,11 +365,16 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
         ingredient_i = ' '.join(x for x in ingredient_i if x.isalpha()) + ' '
         ingredient_i = ingredient_i.replace(' or ', '//').replace(' and ','//').replace(' with ','//').split('//') #if options, add both in the list
         #print('After removing:              ', ingredient_i,"\n")
-                    
         for ingredient_in_list in ingredient_i:
-            ingredient_in_list_strip = ingredient_in_list.strip()                        
-            if ingredient_in_list_strip == '':
+            ingredient_in_list_strip = ingredient_in_list.strip() 
+             ### remove doubles 
+            ingredient_in_list_strip = removeDoubles(ingredient_in_list_strip)
+            #### don't need to add twice the amoount
+            if ingredient_in_list_strip == '' or str(ingredient_in_list_strip) in list_ingred:
                 continue
+            ####
+           
+            
             if ingredient_in_list_strip[len(ingredient_in_list_strip)-1] == 's' and ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] in list_unique_ingredients:
                 ingredient_in_list_strip = ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] #Remove the plural form (s) of the ingredient
                     
@@ -363,8 +382,8 @@ def scrap_food(website, filename,list_ingredient_to_remove, \
             if ingredient_in_list_strip in list_augmented and ((unit_i == -1.0) ^ (quantity_i is None or quantity_i == -1.0)):
                 ## if 2 bananas, quantity is known but unit not
                 if quantity_i != -1.0 and quantity_i is not None: 
-                    quantity_i = float(quantity_i)*augmented_quantity[ingredient_in_list_strip][0]
-                    unit_i = augmented_quantity[ingredient_in_list_strip][1]
+                    quantity_i = float(quantity_i)*augmented_quantity_dict[ingredient_in_list_strip][0]
+                    unit_i = augmented_quantity_dict[ingredient_in_list_strip][1]
                 else:
                     # if quantiy is missing -1.0
                     quantity_i = -1.0
@@ -521,9 +540,16 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
         #print('After removing:              ', ingredient_i,"\n")
                     
         for ingredient_in_list in ingredient_i:
-            ingredient_in_list_strip = ingredient_in_list.strip()                        
-            if ingredient_in_list_strip == '':
+            ingredient_in_list_strip = ingredient_in_list.strip()    
+            
+            
+             ### remove doubles 
+            ingredient_in_list_strip = removeDoubles(ingredient_in_list_strip)
+            #### don't need to add twice the amoount
+            if ingredient_in_list_strip == '' or str(ingredient_in_list_strip) in list_ingred:
                 continue
+            ####
+            
             if ingredient_in_list_strip[len(ingredient_in_list_strip)-1] == 's' and ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] in list_unique_ingredients:
                 ingredient_in_list_strip = ingredient_in_list_strip[0:len(ingredient_in_list_strip)-1] #Remove the plural form (s) of the ingredient
                 
@@ -532,8 +558,8 @@ def scrap_foodnetwork(website, filename, list_ingredient_to_remove, list_unique_
             if ingredient_in_list_strip in list_augmented and ((unit_i == -1.0) ^ (quantity_i is None or quantity_i == -1.0)):
                 ## if 2 bananas, quantity is known but unit not
                 if quantity_i != -1.0 and quantity_i is not None: 
-                    quantity_i = float(quantity_i)*augmented_quantity[ingredient_in_list_strip][0]
-                    unit_i = augmented_quantity[ingredient_in_list_strip][1]
+                    quantity_i = float(quantity_i)*augmented_quantity_dict[ingredient_in_list_strip][0]
+                    unit_i = augmented_quantity_dict[ingredient_in_list_strip][1]
                 else:
                     # if quantiy is missing -1.0
                     quantity_i = -1.0
