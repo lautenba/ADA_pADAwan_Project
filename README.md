@@ -22,7 +22,7 @@ For our project, we will focus on the following questions:
 
 # Dataset
 
-We use the dataset "Cooking recipes". It contains the ingredients, the rating of the recipe (number of reviews and rating of the recipe to assign a popularity index) and the preparation time of the recipe. Scraping is needed since the dataset contains HTML documents, and as there is a lot of different websites, only the most popular ones will be scraped. The quantity of each ingredient is scraped, and online conversion tables for densities and quantities had to be used. For the prediction, the first task will be to select the variables which have a significant impact on the rating. Then, different models have to be fitted to the data. First, we apply a linear regression model to our data create a model able to predict the rating of recipes. After that, we decided to try several classification models. We divided the rating into a binary system of a "good" or "bad" recipe. To realize this classification, we used Random Forests, Neural Networks and K Nearest Neighbors, so we had to optimize the hyperparameters for each of these models. 
+We use the dataset "Cooking recipes". It contains the ingredients, the rating of the recipe (number of reviews and rating of the recipe to assign a popularity index) and the preparation time of the recipe. Scraping is needed since the dataset contains HTML documents, and as there is a lot of different websites, only the most popular ones will be scraped. The quantity of each ingredient is scraped, and for that online conversion tables for densities and quantities had to be used. For the prediction, the first task will be to select the variables which have a significant impact on the rating. Then, different models have to be fitted to the data. First, we apply a linear regression model to our data create a model able to predict the rating of recipes. After that, we decided to try several classification models. We divided the rating into a binary system of a "good" or "bad" recipe. To realize this classification, we used Random Forests, Neural-Networks and K-Nearest-Neighbors, so we had to optimize the hyperparameters for each of these models. 
 
 
 
@@ -45,7 +45,7 @@ We use the dataset "Cooking recipes". It contains the ingredients, the rating of
 
 - Analyse the correctness of our solution, the possible misintepretations and the limitations of our dataset
 
-- Start Report
+- Start the Report
 
 06.12.2019: 
 
