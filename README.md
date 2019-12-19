@@ -2,7 +2,7 @@
 
 # Abstract
 
-What defines a successful recipe? There are a million different meals that have different popularities, and we each have our favorite ones. However, a lot of meals are objectively appreciated across a large part of the population… But what could be the origin of this attractiveness? Our goal is to investigate every variable that could have an impact on the success of the recipe, such as the ingredients, the type of meal (main course, dessert, …), time to prepare it, etc … We use the dataset “Cooking recipes” which provides a ranking of the recipes as well as a lot of interesting variables. We will investigate the relations between these variables and the ranking of the recipe. Based on our analysis, we will create a model that is able to predict the rating of a random recipe. 
+What defines a successful recipe? There are a million different meals that have different popularities, and we each have our favorite ones. However, a lot of meals are objectively appreciated across a large part of the population… But what could be the origin of this attractiveness? Our goal is to investigate if the ingredients and their quantity present in the recipe will have a direct impact on the rating of the recipe. We use the dataset “Cooking recipes” which provides a rating of the recipes as well as a lot of interesting variables. We will investigate the relations between these variables and the rating of the recipe. Based on our analysis, we will create a model that is able to predict the rating of a random recipe. 
 
 
 
@@ -10,9 +10,11 @@ What defines a successful recipe? There are a million different meals that have 
 
 For our project, we will focus on the following questions:
 
-- From where does the rating of the recipe come from ? Ingredients, time, combination between ingredients, what type of meal (main course, dessert, ...), originality ?
+- From where does the rating of the recipe come from ? Ingredients, time, combination between ingredients ?
 
-- Is the pattern clear enough to be able to predict the ranking a new recipe will have ? 
+- Does the quantity of each ingredient have a positive influence on the machine learning models ?
+
+- Is the pattern clear enough to be able to predict the rating a new recipe will have ? 
 
 
 
