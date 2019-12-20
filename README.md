@@ -84,9 +84,9 @@ The code is completed. The ingredients and their quantity are scraped and stored
 The machine learning models are done first for regression, and then for classification.
 
 # Contribution of each group member
-Maxime and Jacopo state
-Maxime : Writing and correcting the report, 
-Jacopo : Creation and testing of the
-Elias : 
-Marco : Data scraping, small first data exploration of the files, checking and removing garbage words 
+We split into two groups : one implementing the biggest part of the scraping, and the other one taking care of the machine learning models creation. 
+Maxime : Being the moral support of Jacopo, writing the report
+Jacopo : Creation and testing of the machine learning models, Improvement of the tuning of the hyperparameters
+Elias : Data scraping, 
+Marco : Data scraping, importation  small data exploration of the files, checking and removing garbage words
 
