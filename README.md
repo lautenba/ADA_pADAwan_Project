@@ -75,7 +75,7 @@ We have separated our code into 3 parts :
 - project.ipynb : The main file for our project which contains all the results and comments.
 - scrap.py : This file contains all the functions used for scraping and returning the desired variables.
 - website_func.py : This file contains all the functions used to determine the origin of the html file (website).
-
+- REPORT_ADA.pdf : 4-page PDF document containing our report
 
 
 # Milestone 3
