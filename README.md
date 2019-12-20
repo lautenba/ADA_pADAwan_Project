@@ -85,8 +85,8 @@ The machine learning models are done first for regression, and then for classifi
 
 # Contribution of each group member
 We split into two groups : one implementing the biggest part of the scraping, and the other one taking care of the machine learning models creation. 
-Maxime : Being the moral support of Jacopo, writing the report
-Jacopo : Creation and testing of the machine learning models, Improvement of the tuning of the hyperparameters
-Elias : Data scraping, 
-Marco : Data scraping, importation  small data exploration of the files, checking and removing garbage words
+- Maxime : Writing the report and the ReadMe. Coded the first part of the datascraping to collect the ingredients, prepare time, number of ratings,... Also helped Jacopo for the machine learning part.
+- Jacopo : Creation and testing of the machine learning models, Improvement of the tuning of the hyperparameters
+- Elias : Data scraping, 
+- Marco : Data scraping, importation  small data exploration of the files, checking and removing garbage words
 
